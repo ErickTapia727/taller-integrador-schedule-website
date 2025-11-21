@@ -12,7 +12,7 @@ $DEBUG_MODE = true;
 
 // Set this to the role you want to test.
 // Opciones: 'admin' or 'client'
-$DEBUG_FORCE_ROLE = 'client';
+$DEBUG_FORCE_ROLE = 'admin';
 
 // --- 3. SESSION LOGIC ---
 if ($DEBUG_MODE) {

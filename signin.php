@@ -14,9 +14,9 @@
 <body>
   <div class="container-fluid vh-100">
     <div class="row h-100 justify-content-center">
-      <div class="p-5 bg-primary my-5">
+      <div class="p-4 bg-primary my-5">
 
-        <div class="text-center mb-5 mt-3">
+        <div class="text-center mb-3 mt-3">
           <h1 class="bg-light fw-bold py-3 px-5 d-inline-block shadow">¡Bienvenido!</h1>
         </div>
 
@@ -30,7 +30,7 @@
             -->
             <form action="procesar_registro.php" method="POST" class="registro-form">
 
-              <h2 class="mb-5 fs-1 fw-bold">Registrarse</h2>
+              <h2 class="mb-4 fs-1 fw-bold">Registrarse</h2>
 
               <!-- Mensajes de Error -->
               <?php 
@@ -49,7 +49,9 @@
                 <?php elseif ($_GET['error'] === 'rut_existe'): ?>
                     <div class="alert alert-danger">Ya existe una cuenta con ese rut.</div>
                 <?php elseif ($_GET['error'] === 'nombre_existe'): ?>
-                    <div class="alert alert-danger">Ya existe una cuente con ese nombre.</div>
+                    <div class="alert alert-danger">Ya existe una cuenta con ese nombre.</div>
+                <?php elseif ($_GET['error'] === 'contrasenas_no_coinciden'): ?>
+                    <div class="alert alert-danger">Las contraseñas no coinciden.</div>
                 <?php elseif ($_GET['error'] === 'datos_incompletos'): ?>
                     <div class="alert alert-danger">Rellenar todos los campos.</div>
                 <?php elseif ($_GET['error'] === 'email_invalido'): ?>
@@ -63,7 +65,7 @@
                 <?php endif; ?>
               <?php endif; ?>
 
-              <div class="group mb-5">
+              <div class="group mb-5 mt-5">
                 <input required="" type="text" class="input <?php echo (isset($_GET['error']) && in_array($_GET['error'], ['datos_incompletos', 'nombre_existe'])) && (($_GET['error'] === 'datos_incompletos' && empty($nombre_value)) || $_GET['error'] === 'nombre_existe') ? 'error-field' : ''; ?>" id="inputNombre" name="inputNombre" maxlength="50" value="<?php echo $nombre_value; ?>">
                 <i class="bi bi-person custom-icono"></i>
                 <span class="highlight"></span>
@@ -81,7 +83,7 @@
 
               <div class="group mb-5 password-container">
                 <!-- Cambiado a type="password" por seguridad -->
-                <input required="" type="password" class="input <?php echo (isset($_GET['error']) && $_GET['error'] === 'contrasena_debil') ? 'error-field' : ''; ?>" id="inputContraseña" name="inputContraseña" maxlength="50" minlength="8">
+                <input required="" type="password" class="input <?php echo (isset($_GET['error']) && in_array($_GET['error'], ['contrasena_debil', 'contrasenas_no_coinciden'])) ? 'error-field' : ''; ?>" id="inputContraseña" name="inputContraseña" maxlength="50" minlength="8">
                 <i class="bi bi-lock custom-icono"></i>
                 <span class="highlight"></span>
                 <span class="bar"></span>
@@ -96,6 +98,14 @@
                     <li id="number-special-check">✗ Al menos un número o símbolo especial</li>
                   </ul>
                 </div>
+              </div>
+
+              <div class="group mb-5">
+                <input required="" type="password" class="input <?php echo (isset($_GET['error']) && $_GET['error'] === 'contrasenas_no_coinciden') ? 'error-field' : ''; ?>" id="inputConfirmarContraseña" name="inputConfirmarContraseña" maxlength="50" minlength="8">
+                <i class="bi bi-lock-fill custom-icono"></i>
+                <span class="highlight"></span>
+                <span class="bar"></span>
+                <label for="inputConfirmarContraseña">Confirmar Contraseña</label>
               </div>
 
               <div class="group mb-5">
@@ -128,93 +138,19 @@
 
           </div>
             <div class="col-md-6 text-center ">
-              <img src="images/dogcutespa.png" class="img-fluid rounded shadow mt-5" alt="logo" style="max-height: 400px; width: auto; border: 4px solid #000000; box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);"> 
+              <!-- TODO: Ask the client for the original image since its quality is too low -->
+              <img src="images/dogcutespa-resized.png" class="img-fluid rounded shadow" alt="logo" style="max-height: 600px; width: auto; border: 6px solid #000000; box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);"> 
             </div>
         </div>
       </div>
     </div>
   </div>
 
-<style>
-/* Estilos para el tooltip de criterios de contraseña */
-.password-container {
-  position: relative;
-}
-
-.password-tooltip {
-  position: absolute;
-  top: -10px;
-  left: 520px;
-  background: #333;
-  color: white;
-  padding: 15px;
-  border-radius: 8px;
-  font-size: 14px;
-  width: 280px;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s, visibility 0.3s;
-  z-index: 1000;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-.password-tooltip::before {
-  content: '';
-  position: absolute;
-  top: 20px;
-  left: -8px;
-  width: 0;
-  height: 0;
-  border-top: 8px solid transparent;
-  border-bottom: 8px solid transparent;
-  border-right: 8px solid #333;
-}
-
-.password-container:hover .password-tooltip,
-.password-container .input:focus ~ .password-tooltip {
-  opacity: 1;
-  visibility: visible;
-}
-
-.password-tooltip ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.password-tooltip li {
-  padding: 2px 0;
-  font-size: 13px;
-}
-
-.password-tooltip li.valid {
-  color: #4CAF50;
-}
-
-.password-tooltip li.invalid {
-  color: #ff6b6b;
-}
-
-/* Estilos para campos con error */
-.error-field {
-  border-bottom: 2px solid #dc3545 !important;
-  background: rgba(220, 53, 69, 0.1) !important;
-}
-
-.error-field:focus {
-  border-bottom: 2px solid #dc3545 !important;
-}
-
-.error-field:focus ~ .bar:before,
-.error-field:focus ~ .bar:after {
-  background: #dc3545 !important;
-}
-</style>
-
 <script>
 // Validación de criterios de contraseña
 document.addEventListener('DOMContentLoaded', function() {
     const passwordInput = document.getElementById('inputContraseña');
+    const confirmPasswordInput = document.getElementById('inputConfirmarContraseña');
     const lengthCheck = document.getElementById('length-check');
     const caseCheck = document.getElementById('case-check');
     const numberSpecialCheck = document.getElementById('number-special-check');
@@ -254,7 +190,35 @@ document.addEventListener('DOMContentLoaded', function() {
                 numberSpecialCheck.innerHTML = '✗ Al menos un número o símbolo especial';
                 numberSpecialCheck.className = 'invalid';
             }
+            
+            // Verificar coincidencia con confirmación
+            checkPasswordMatch();
         });
+    }
+
+    // Validación de confirmación de contraseña
+    if (confirmPasswordInput) {
+        confirmPasswordInput.addEventListener('input', checkPasswordMatch);
+    }
+
+    // Función para verificar coincidencia de contraseñas
+    function checkPasswordMatch() {
+        if (passwordInput && confirmPasswordInput) {
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+            
+            if (confirmPassword.length > 0) {
+                if (password === confirmPassword) {
+                    confirmPasswordInput.classList.remove('error-field');
+                    confirmPasswordInput.classList.add('valid-field');
+                } else {
+                    confirmPasswordInput.classList.remove('valid-field');
+                    confirmPasswordInput.classList.add('error-field');
+                }
+            } else {
+                confirmPasswordInput.classList.remove('error-field', 'valid-field');
+            }
+        }
     }
 
     // Validación y formato de teléfono chileno
@@ -299,34 +263,26 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Validar en envío del formulario
+        // Validar en envío del formulario - Solo validaciones de formato, no errores
         const form = phoneInput.closest('form');
         if (form) {
             form.addEventListener('submit', function(e) {
                 const password = passwordInput.value;
+                const confirmPassword = confirmPasswordInput ? confirmPasswordInput.value : '';
                 const phone = phoneInput.value;
                 
-                // Validación de contraseña
-                const hasMinLength = password.length >= 8;
-                const hasUpper = /[A-Z]/.test(password);
-                const hasLower = /[a-z]/.test(password);
-                const hasNumberOrSpecial = /[0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
-                
-                // Validación de teléfono chileno
-                const phoneRegex = /^\+56 9 \d{4} \d{4}$/;
-                const isValidPhone = phoneRegex.test(phone);
-                
-                if (!hasMinLength || !hasUpper || !hasLower || !hasNumberOrSpecial) {
-                    e.preventDefault();
-                    alert('La contraseña no cumple con todos los criterios requeridos.');
-                    return;
+                // Solo verificar formato básico de teléfono si no está vacío
+                if (phone && phone !== '+56 9 ') {
+                    const phoneRegex = /^\+56 9 \d{4} \d{4}$/;
+                    if (!phoneRegex.test(phone)) {
+                        e.preventDefault();
+                        alert('El formato del teléfono debe ser: +56 9 XXXX XXXX');
+                        return;
+                    }
                 }
                 
-                if (!isValidPhone) {
-                    e.preventDefault();
-                    alert('El formato del teléfono debe ser: +56 9 XXXX XXXX');
-                    return;
-                }
+                // El resto de validaciones las manejará el backend
+                // Los errores se mostrarán en la sección "Mensajes de Error"
             });
         }
     }

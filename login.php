@@ -86,7 +86,8 @@
             </form>
           </div>
             <div class="col-md-6 text-center ">
-              <img src="images/dogcutespa.png" class="img-fluid rounded shadow mt-5" alt="logo" style="max-height: 400px; width: auto; border: 4px solid #000000; box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);"> 
+              //TODO: Ask the client for the original image since its quality is too low
+              <img src="images/dogcutespa-resized.png" class="img-fluid rounded shadow mt-5" alt="logo" style="max-height: 600px; width: auto; border: 6px solid #000000; box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);"> 
             </div>
         </div>
       </div>

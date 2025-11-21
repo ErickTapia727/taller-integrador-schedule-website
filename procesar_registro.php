@@ -6,11 +6,12 @@ include 'includes/utils.php';
 $nombre = isset($_POST['inputNombre']) ? trim($_POST['inputNombre']) : '';
 $correo = isset($_POST['inputCorreo']) ? trim($_POST['inputCorreo']) : '';
 $contrasena = isset($_POST['inputContraseña']) ? $_POST['inputContraseña'] : '';
+$confirmar_contrasena = isset($_POST['inputConfirmarContraseña']) ? $_POST['inputConfirmarContraseña'] : '';
 $rut = isset($_POST['inputRut']) ? trim($_POST['inputRut']) : '';
 $telefono = isset($_POST['inputTelefono']) ? trim($_POST['inputTelefono']) : '';
 
 // Validaciones básicas
-if ($nombre === '' || $correo === '' || $contrasena === '' || $rut === '') {
+if ($nombre === '' || $correo === '' || $contrasena === '' || $confirmar_contrasena === '' || $rut === '') {
     $params = http_build_query([
         'error' => 'datos_incompletos',
         'nombre' => $nombre,
@@ -24,6 +25,19 @@ if ($nombre === '' || $correo === '' || $contrasena === '' || $rut === '') {
 if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
     $params = http_build_query([
         'error' => 'email_invalido',
+        'nombre' => $nombre,
+        'correo' => $correo,
+        'rut' => $rut,
+        'telefono' => $telefono
+    ]);
+    header("Location: signin.php?$params");
+    exit();
+}
+
+// Validar que las contraseñas coincidan
+if ($contrasena !== $confirmar_contrasena) {
+    $params = http_build_query([
+        'error' => 'contrasenas_no_coinciden',
         'nombre' => $nombre,
         'correo' => $correo,
         'rut' => $rut,
