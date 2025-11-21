@@ -1,230 +1,87 @@
-# 🐕 Dog Cute Spa - Sistema de Gestión de Citas
+Sistema de Gestión de Citas
+Descripción General
+Sistema web integral diseñado para la administración de un spa canino. La plataforma permite la gestión centralizada de citas, bases de datos de clientes y registros de mascotas, implementando un diseño responsivo y validaciones de seguridad robustas.
 
-> **Sistema web para spa canino con gestión completa de citas, clientes y mascotas**
+Funcionalidades Principales
+Autenticación y Seguridad
+Control de Acceso: Sistema de registro y validación de usuarios (incluyendo validación de RUT chileno).
 
-[![PHP](https://img.shields.io/badge/PHP-8.0+-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://php.net)
-[![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3.8-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white)](https://getbootstrap.com)
-[![SCSS](https://img.shields.io/badge/SCSS-CC6699?style=for-the-badge&logo=sass&logoColor=white)](https://sass-lang.com)
+Roles: Perfiles diferenciados para Administradores y Clientes.
 
-## 📋 Descripción
+Seguridad: Gestión de sesiones persistentes, validación de duplicados (email, RUT) y criterios estrictos de contraseña.
 
-Dog Cute Spa es un sistema web completo para la gestión de un spa canino que incluye:
+Sistema de Agenda
+Visualización: Calendario con vista semanal y navegación mensual.
 
-- **🗓️ Sistema de agenda** con vista semanal para administradores y clientes
-- **👥 Gestión de clientes** con registro, edición y eliminación
-- **🐕 Gestión de mascotas** con información detallada de cada animal
-- **🔐 Sistema de autenticación** completo con roles (admin/cliente)
-- **📱 Diseño responsivo** compatible con dispositivos móviles
-- **✅ Validaciones robustas** para todos los formularios
+Horarios: Gestión de bloques de 2 horas entre las 08:00 y las 17:00.
 
-## 🚀 Características Principales
+Operaciones: Agendamiento por parte de clientes y bloqueo de horarios/gestión de reportes por parte de administradores.
 
-### 🔑 **Sistema de Autenticación**
-- **Registro de usuarios** con validación de RUT chileno
-- **Login seguro** con criterios de contraseña robustos
-- **Roles diferenciados**: Administrador y Cliente
-- **Sesiones persistentes** con logout seguro
-- **Validación de duplicados** (email, RUT, nombre)
+Gestión de Usuarios y Mascotas
+Administradores: Acceso global a la lista de clientes y mascotas.
 
-### 📅 **Sistema de Agenda**
-- **Vista semanal** con navegación por meses
-- **Gestión de horarios** (08:00 - 17:00) en bloques de 2 horas
-- **Agendamiento de citas** por parte de clientes
-- **Bloqueo de horarios** por parte de administradores
-- **Reportes de citas** con estado (completado/cancelado)
+Clientes: Gestión exclusiva de sus propias mascotas e historial.
 
-### 👤 **Gestión de Usuarios**
-- **Administradores**: Ver todos los clientes y sus mascotas
-- **Clientes**: Gestionar solo sus propias mascotas
-- **CRUD completo** para clientes y mascotas
-- **Validación de datos** en tiempo real
+Datos: Funcionalidad CRUD (Crear, Leer, Actualizar, Eliminar) completa.
 
-### 📱 **Diseño Responsivo**
-- **Bootstrap 5.3.8** para UI consistente
-- **SCSS personalizado** con tema rosa/blanco
-- **Iconos Bootstrap** para mejor UX
-- **Adaptable** a móviles, tablets y desktop
+Stack Tecnológico
+Frontend
+Core: HTML5, CSS3, JavaScript ES6.
 
-## 🛠️ Tecnologías Utilizadas
+Framework: Bootstrap 5.3.8 (vía NPM).
 
-### **Frontend**
-- **HTML5** + **CSS3** + **JavaScript ES6**
-- **Bootstrap 5.3.8** (vía NPM)
-- **SCSS** para estilos personalizados
-- **Bootstrap Icons** para iconografía
+Estilos: SCSS personalizado y Bootstrap Icons.
 
-### **Backend**
-- **PHP 8.0+** para lógica del servidor
-- **Sesiones PHP** para gestión de estado
-- **Validación server-side** robusta
-- **Arquitectura modular** con includes
+Backend
+Lenguaje: PHP 8.0+.
 
-### **Herramientas de Desarrollo**
-- **NPM** para gestión de dependencias
-- **Live Sass Compiler** (VS Code) o **npm scripts**
-- **Git** para control de versiones
+Arquitectura: Modular basada en includes, uso de sesiones PHP y validaciones del lado del servidor.
 
-## 📦 Instalación
+Herramientas de Desarrollo
+Gestión de Paquetes: NPM.
 
-### **Prerequisitos**
-```bash
-# Servidor web (Apache/Nginx)
-# PHP 8.0+
-# Node.js y NPM
-```
+Compilación: Scripts NPM o Live Sass Compiler.
 
-### **Pasos de Instalación**
+Control de Versiones: Git.
 
-1. **Clonar el repositorio**
-```bash
-git clone <repository-url>
-cd dog-cute-spa
-```
+Instalación y Configuración
+Requisitos Previos
+Servidor web (Apache o Nginx).
 
-2. **Instalar dependencias NPM**
-```bash
-npm install
-```
+PHP 8.0 o superior.
 
-3. **Compilar SCSS**
-```bash
-# Opción 1: NPM script
-npm run build-css
+Node.js y NPM.
 
-# Opción 2: Live Sass Compiler (VS Code)
-# Abrir src/main.scss y usar la extensión
-```
+Pasos de Despliegue
+Clonar el repositorio.
 
-4. **Configurar servidor web**
-```bash
-# Apache: Apuntar DocumentRoot a la carpeta del proyecto
-# Nginx: Configurar root a la carpeta del proyecto
-```
+Instalar dependencias mediante npm install.
 
-5. **Configurar permisos (si es necesario)**
-```bash
-chmod 755 includes/
-chmod 644 *.php
-```
+Compilar los archivos SCSS (npm run build-css).
 
-## 🎮 Uso del Sistema
+Configurar el directorio raíz del servidor web.
 
-### **Credenciales Demo**
-```bash
-# Administrador
-Email: admin@example.com
-Password: Admin123!
+Ajustar permisos de lectura/escritura en carpetas del sistema.
 
-# Cliente Demo  
-Email: cliente@example.com
-Password: Cliente123!
-```
+Configuración del Sistema
+Entorno: Variable $DEBUG_MODE para alternar entre modo desarrollo (usuarios demo) y producción.
 
-### **Flujo de Trabajo**
+Formatos: Estandarización de teléfonos (formato chileno) y validación de contraseñas seguras.
 
-#### **👨‍💼 Como Administrador:**
-1. **Login** → Acceso completo al sistema
-2. **Agenda** → Ver/bloquear horarios, gestionar reportes
-3. **Clientes** → Ver todos los clientes y sus mascotas
-4. **Configuración** → Gestión de perfil
+Estructura del Proyecto
+El sistema se organiza en:
 
-#### **👤 Como Cliente:**
-1. **Registro** → Crear cuenta con validaciones
-2. **Login** → Acceso a funciones de cliente
-3. **Agenda** → Agendar citas para mis mascotas
-4. **Mascotas** → Gestionar mis mascotas registradas
-5. **Historial** → Ver mis citas pasadas
+Core: Scripts PHP principales para la lógica de negocio.
 
-## 📁 Estructura del Proyecto
+Includes/Layout: Componentes reutilizables y plantillas de interfaz.
 
-```
-dog-cute-spa/
-├── 📄 *.php                 # Páginas principales
-├── 📁 includes/            # Funciones reutilizables
-│   └── utils.php           # Validaciones (ej: RUT)
-├── 📁 layout/              # Plantillas compartidas  
-│   ├── header.php          # Header con autenticación
-│   └── footer.php          # Footer estándar
-├── 📁 src/                 # Assets del frontend
-│   ├── main.scss           # Estilos personalizados
-│   └── main.css            # CSS compilado
-├── 📁 images/              # Imágenes del proyecto
-├── 📁 node_modules/        # Dependencias NPM
-├── 📄 package.json         # Configuración NPM
-├── 📄 temp_users.json      # Usuarios demo (temporal)
-└── 📄 *.md                 # Documentación
-```
+Src/Assets: Código fuente frontend y recursos gráficos.
 
-## 📚 Documentación
+Data: Almacenamiento temporal basado en JSON (temp_users.json).
 
-### **Archivos de Documentación Incluidos:**
-- **📄 AUTH_README.md** - Sistema de autenticación completo
-- **📄 TESTING_AUTH.md** - Guía de testing del sistema
-- **📄 PROBLEMA_RESUELTO.md** - Resolución de bugs críticos
-- **📄 CREDENCIALES_ACTUALIZADAS.md** - Nuevas credenciales seguras
-- **📄 VALIDACION_DUPLICADOS.md** - Sistema anti-duplicados
+Próximos Pasos (Roadmap)
+Base de Datos: Migración del sistema de archivos JSON a MySQL.
 
-### **Componentes Principales:**
-- **agenda.php** - Sistema de citas con calendario
-- **clients.php** - Gestión dual admin/cliente
-- **login.php** / **signin.php** - Autenticación
-- **procesar_*.php** - Lógica de backend
-- **layout/header.php** - Gestión de sesiones centralized
+Seguridad: Implementación de hashing para contraseñas.
 
-## 🔧 Configuración
-
-### **Modo Debug vs Producción**
-```php
-// En layout/header.php
-$DEBUG_MODE = true;   // Desarrollo: usar usuarios demo
-$DEBUG_MODE = false;  // Producción: requerir login real
-```
-
-### **Criterios de Contraseña**
-- ✅ Mínimo 8 caracteres
-- ✅ Al menos una mayúscula y minúscula  
-- ✅ Al menos un número o símbolo especial
-
-### **Formato de Teléfono**
-- ✅ Formato chileno: `+56 9 XXXX XXXX`
-- ✅ Autoformato en tiempo real
-
-## 🧪 Testing
-
-### **Casos de Prueba Principales:**
-1. **Registro de usuario** con validaciones
-2. **Login/Logout** completo
-3. **Agendamiento de citas** por clientes
-4. **Gestión de mascotas** CRUD
-5. **Bloqueo de horarios** por admin
-6. **Validación de duplicados** en registro
-
-Ver **TESTING_AUTH.md** para guía completa de testing.
-
-## 🔄 Próximos Pasos
-
-### **Migración a Base de Datos:**
-- [ ] Reemplazar archivo JSON con MySQL
-- [ ] Implementar password hashing real
-- [ ] Añadir índices para optimización
-
-### **Funcionalidades Adicionales:**
-- [ ] Sistema de notificaciones
-- [ ] Reportes de ingresos  
-- [ ] Gestión de servicios y precios
-- [ ] API REST para app móvil
-
-## 📞 Soporte
-
-Para soporte técnico o preguntas sobre el sistema:
-- **Documentación**: Revisar archivos *.md incluidos
-- **Testing**: Seguir TESTING_AUTH.md
-- **Configuración**: Ver AUTH_README.md
-
-## 📄 Licencia
-
-Este proyecto es para uso educativo y comercial del Dog Cute Spa.
-
----
-
-**🐕 ¡Desarrollado con amor para nuestros amigos peludos! 🐕**
+Funcionalidades: Desarrollo de sistema de notificaciones, reportes financieros y API REST.
