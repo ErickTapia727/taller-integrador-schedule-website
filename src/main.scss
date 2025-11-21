@@ -1,0 +1,212 @@
+// Custom.scss
+// Option A: Include all of Bootstrap
+
+// Include any default variable overrides here (though functions won’t be available)
+
+//TODO: Decidir un color primario para texto y botones de uiverse en login.php and signin.php
+$primary: rgb(169, 182, 240);
+
+@import "../node_modules/bootstrap/scss/bootstrap";
+
+html, body{
+    height: 100%;
+}
+
+
+//input box (registro-inicio de sesión)
+.group {
+ position: relative;
+}
+
+.input {
+ font-size: 20px;
+ padding: 10px 50px 10px 5px;
+ display: block;
+ width: 500px;
+ border: none;
+ border-bottom: 1px solid #515151;
+ background: rgba(220, 224, 227);
+}
+
+.input:focus {
+ outline: none;
+}
+
+.group label {
+  color: rgba(89, 89, 89);
+  font-size: 18px;
+  font-weight: normal;
+  position: absolute;
+  pointer-events: none;
+  left: 10px;
+  top: 10px;
+  transition: 0.2s ease all;
+  -moz-transition: 0.2s ease all;
+  -webkit-transition: 0.2s ease all;
+  white-space: nowrap;
+}
+
+/* Ajuste: usar :not(:placeholder-shown) para detectar inputs con contenido y evitar afectar labels normales de bootstrap */
+.input:focus ~ label,
+.input:not(:placeholder-shown) ~ label {
+  top: -18px;
+  font-size: 14px;
+  color: #000000;
+}
+
+.bar {
+ position: relative;
+ display: block;
+ width: 500px;
+}
+
+.bar:before, .bar:after {
+ content: '';
+ height: 2px;
+ width: 0;
+ bottom: 1px;
+ position: absolute;
+ background: #5264AE;
+ transition: 0.2s ease all;
+ -moz-transition: 0.2s ease all;
+ -webkit-transition: 0.2s ease all;
+}
+
+.bar:before {
+ left: 50%;
+}
+
+.bar:after {
+ right: 50%;
+}
+
+.input:focus ~ .bar:before, .input:focus ~ .bar:after {
+ width: 50%;
+}
+
+.highlight {
+ position: absolute;
+ height: 60%;
+ width: 350px;
+ top: 25%;
+ left: 0;
+ pointer-events: none;
+ opacity: 0.5;
+}
+
+.input:focus ~ .highlight {
+ animation: inputHighlighter 0.3s ease;
+}
+
+@keyframes inputHighlighter {
+ from {
+  background: $primary;
+ }
+
+ to {
+  width: 0;
+  background: transparent;
+ }
+}
+
+//Button (registro-inico de sesión)
+
+.custom-button  {
+  --primary-color: #645bff;
+  --secondary-color: #fff;
+  --hover-color: #2d288f;
+  --arrow-width: 20px;
+  --arrow-stroke: 3px;
+  box-sizing: border-box;
+  border: 0;
+  border-radius: 25px;
+  color: var(--secondary-color);
+  padding: 15px 200px;
+  background: var(--primary-color);
+  display: flex;
+  transition: 0.2s background;
+  align-items: center;
+  gap: 0.6em;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.custom-button .arrow-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.custom-button .arrow {
+  margin-top: 1px;
+  width: var(--arrow-width);
+  background: var(--primary-color);
+  height: var(--arrow-stroke);
+  position: relative;
+  transition: 0.2s;
+}
+
+.custom-button .arrow::before {
+  content: "";
+  box-sizing: border-box;
+  position: absolute;
+  border: solid var(--secondary-color);
+  border-width: 0 var(--arrow-stroke) var(--arrow-stroke) 0;
+  display: inline-block;
+  top: -3px;
+  right: 3px;
+  transition: 0.2s;
+  padding: 3px;
+  transform: rotate(-45deg);
+}
+
+.custom-button:hover {
+  background-color: var(--hover-color);
+}
+
+.custom-button:hover .arrow {
+  background: var(--secondary-color);
+}
+
+.custom-button:hover .arrow:before {
+  right: 0;
+}
+
+//ICONOS (i class)
+.custom-icono {
+  // Use absolute position so it stays in the corner of the .group container
+  position: absolute;
+  
+  // Align it to the right and vertically center it
+  left: 450px; // Spacing from the right edge
+  top: -10px; // Adjust this value to center it vertically
+  
+  // Make sure it doesn't interfere with typing
+  pointer-events: none;
+  
+  // Set the color and size
+  color: rgba(89, 89, 89); // Matches the default label color
+  font-size: 3rem;
+}
+
+// When the input is focused, change the icon color to match the bar color
+.input:focus ~ .custom-icono {
+  color: #5264AE; /* Matches the bar color */
+}
+
+
+
+//DIMENSIONES PERSONALIZADAS (class)
+.registro-form{
+  max-width: 500px;
+
+  margin-left:auto;
+  margin-right:auto;
+}
+
+.inicio_sesion-form{
+  max-width: 500px;
+
+  margin-left:auto;
+  margin-right:auto;
+}
