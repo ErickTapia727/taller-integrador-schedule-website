@@ -132,7 +132,7 @@
                 </div>
               </button>
 
-              <a href="login.php" class="py-3 fs-4 bg-transparent text-dark fw-bold ">¡Ya tienes una cuenta? Iniciar Sesión</a>
+              <a href="login.php" class="py-3 fs-4 bg-transparent text-dark fw-bold ">¿Ya tienes una cuenta? Iniciar Sesión</a>
 
             </form>
 

@@ -165,7 +165,7 @@ include 'layout/header.php';
                                 $userAppointments[] = $appointment;
                             }
                         }
-                        
+                        //TODO: Mostrar citas agendadas en cuentas de clientes a través de agenda.php
                         if (empty($userAppointments)): ?>
                             <tr>
                                 <td colspan="6" class="text-center text-muted py-4">

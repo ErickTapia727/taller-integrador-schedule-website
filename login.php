@@ -58,7 +58,7 @@
                 <div class="alert alert-info">Sesión cerrada correctamente.</div>
               <?php endif; ?>
 
-              <div class="group mb-5">
+              <div class="group mb-5 mt-5">
                 <input required="" type="text" class="input <?php echo (isset($_GET['error']) && in_array($_GET['error'], ['email_invalido', 'credenciales_incorrectas', 'datos_incompletos'])) ? 'error-field' : ''; ?>" id="inputCorreo" name="inputCorreo" maxlength="50" value="<?php echo $correo_value; ?>">
                 <i class="bi bi-envelope custom-icono"></i>
                 <span class="highlight"></span>
@@ -86,7 +86,7 @@
             </form>
           </div>
             <div class="col-md-6 text-center ">
-              //TODO: Ask the client for the original image since its quality is too low
+              <!-- TODO: Ask the client for the original image since its quality is too low -->
               <img src="images/dogcutespa-resized.png" class="img-fluid rounded shadow mt-5" alt="logo" style="max-height: 600px; width: auto; border: 6px solid #000000; box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);"> 
             </div>
         </div>
