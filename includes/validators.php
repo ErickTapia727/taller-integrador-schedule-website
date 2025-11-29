@@ -110,28 +110,32 @@ function validatePassword($password) {
     $minLength = defined('MIN_PASSWORD_LENGTH') ? MIN_PASSWORD_LENGTH : 8;
     $maxLength = defined('MAX_PASSWORD_LENGTH') ? MAX_PASSWORD_LENGTH : 50;
     
+    // Verificar longitud mínima
     if (strlen($password) < $minLength) {
         $errors[] = "La contraseña debe tener al menos {$minLength} caracteres";
     }
     
+    // Verificar longitud máxima
     if (strlen($password) > $maxLength) {
         $errors[] = "La contraseña no debe exceder {$maxLength} caracteres";
     }
     
+    // Verificar al menos una letra mayúscula
     if (!preg_match('/[A-Z]/', $password)) {
         $errors[] = "La contraseña debe contener al menos una letra mayúscula";
     }
     
+    // Verificar al menos una letra minúscula
     if (!preg_match('/[a-z]/', $password)) {
         $errors[] = "La contraseña debe contener al menos una letra minúscula";
     }
     
-    if (!preg_match('/[0-9]/', $password)) {
-        $errors[] = "La contraseña debe contener al menos un número";
-    }
+    // Verificar al menos un número O un carácter especial (no ambos requeridos)
+    $hasNumber = preg_match('/[0-9]/', $password);
+    $hasSpecial = preg_match('/[^A-Za-z0-9]/', $password);
     
-    if (!preg_match('/[^A-Za-z0-9]/', $password)) {
-        $errors[] = "La contraseña debe contener al menos un carácter especial";
+    if (!$hasNumber && !$hasSpecial) {
+        $errors[] = "La contraseña debe contener al menos un número o un carácter especial";
     }
     
     return [
