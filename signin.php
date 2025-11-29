@@ -5,10 +5,16 @@
     <meta http-equiv="X-UA-Compatible" content="IE-edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Taller integrador - Registro</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="images/dogcutespa-resized.png">
 
-    <link rel="stylesheet" href="/src/main.css">
+    <!-- Bootstrap CSS Local -->
+    <link rel="stylesheet" href="libs/bootstrap/bootstrap.min.css">
+    <!-- Bootstrap Icons CDN -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- CSS Personalizado -->
+    <link rel="stylesheet" href="src/main.css">
 
   </head>
 <body>
@@ -48,6 +54,8 @@
                     <div class="alert alert-danger">Ya existe una cuenta con ese correo</div>
                 <?php elseif ($_GET['error'] === 'rut_existe'): ?>
                     <div class="alert alert-danger">Ya existe una cuenta con ese rut.</div>
+                <?php elseif ($_GET['error'] === 'telefono_existe'): ?>
+                    <div class="alert alert-danger">Ya existe una cuenta con ese número de teléfono.</div>
                 <?php elseif ($_GET['error'] === 'nombre_existe'): ?>
                     <div class="alert alert-danger">Ya existe una cuenta con ese nombre.</div>
                 <?php elseif ($_GET['error'] === 'contrasenas_no_coinciden'): ?>
@@ -117,7 +125,7 @@
               </div>
 
               <div class="group mb-5">
-                <input required="" type="tel" class="input <?php echo (isset($_GET['error']) && $_GET['error'] === 'telefono_invalido') ? 'error-field' : ''; ?>" id="inputTelefono" name="inputTelefono" maxlength="15" value="<?php echo $telefono_value; ?>" placeholder="+56 9 XXXX XXXX">
+                <input required="" type="tel" class="input <?php echo (isset($_GET['error']) && in_array($_GET['error'], ['telefono_invalido', 'telefono_existe'])) ? 'error-field' : ''; ?>" id="inputTelefono" name="inputTelefono" maxlength="15" value="<?php echo $telefono_value; ?>" placeholder="+56 9 XXXX XXXX">
                 <i class="bi bi-telephone custom-icono"></i>
                 <span class="highlight"></span>
                 <span class="bar"></span>
@@ -288,6 +296,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+
+<!-- Bootstrap JS Local -->
+<script src="libs/bootstrap/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

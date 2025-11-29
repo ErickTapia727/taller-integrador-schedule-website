@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "copy-bootstrap": "cp node_modules/bootstrap/dist/css/bootstrap.min.css* libs/bootstrap/ && cp node_modules/bootstrap/dist/js/bootstrap.bundle.min.js* libs/bootstrap/",
+    "postinstall": "npm run copy-bootstrap"
   },
   "keywords": [],
   "author": "",

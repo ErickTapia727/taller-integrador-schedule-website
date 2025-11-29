@@ -5,10 +5,15 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
+// Define base path for assets (empty for root files, 'layout/' prefix not needed)
+if (!isset($base_path)) {
+    $base_path = '';
+}
+
 // --- 2. DEBUGGING SWITCH (YOUR NEW "INTERRUPTOR") ---
 // Set to 'true' to use the placeholder role below.
 // Set to 'false' to test the REAL login/logout flow.
-$DEBUG_MODE = true;
+$DEBUG_MODE = false;
 
 // Set this to the role you want to test.
 // Opciones: 'admin' or 'client'
@@ -21,10 +26,12 @@ if ($DEBUG_MODE) {
         $_SESSION['user_id'] = 1;
         $_SESSION['user_name'] = 'Admin (Prueba)';
         $_SESSION['user_role'] = 'admin';
+        $_SESSION['role'] = 'Administrador';
     } else {
         $_SESSION['user_id'] = 2;
         $_SESSION['user_name'] = 'Cliente (Prueba)';
         $_SESSION['user_role'] = 'client';
+        $_SESSION['role'] = 'Cliente';
     }
 } else {
     // We are in Live Mode. Check for a real session.
@@ -32,6 +39,11 @@ if ($DEBUG_MODE) {
     if (!isset($_SESSION['user_id'])) {
         header('Location: login.php?error=no_sesion');
         exit();
+    }
+    
+    // Set user_role based on role from database
+    if (isset($_SESSION['role'])) {
+        $_SESSION['user_role'] = ($_SESSION['role'] === 'Administrador') ? 'admin' : 'client';
     }
 }
 
@@ -54,16 +66,19 @@ if (!isset($active_link)) {
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE-edge">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($page_title); ?> - Taller integrador</title>
 
-    <!-- Load Custom CSS (from main.scss compilation) -->
-    <link rel="stylesheet" href="/src/main.css">
-    <!-- Load Bootstrap Icons -->
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="<?php echo $base_path; ?>images/dogcutespa-resized.png">
+    
+    <!-- Bootstrap CSS Local -->
+    <link rel="stylesheet" href="<?php echo $base_path; ?>libs/bootstrap/bootstrap.min.css">
+    <!-- Bootstrap Icons CDN -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <!-- Load Bootstrap JS Bundle (Installed via NPM) -->
-    <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- CSS Personalizado -->
+    <link rel="stylesheet" href="<?php echo $base_path; ?>src/main.css">
 
     <style>
         /* Your custom pink color styles */

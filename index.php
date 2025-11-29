@@ -6,9 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Peluquería canina DogCuiteSpa - Inicio</title>
 
-    <link rel="stylesheet" href="/src/main.css">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="libs/bootstrap/bootstrap.min.css">
+    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- CSS Personalizado -->
+    <link rel="stylesheet" href="src/main.css">
 </head>
 
 <body>
@@ -363,5 +366,8 @@
             opacity: 0.3;
         }
     </style>
+
+    <!-- Bootstrap JS -->
+    <script src="libs/bootstrap/bootstrap.bundle.min.js"></script>
 </body>
 </html>

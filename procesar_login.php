@@ -1,21 +1,25 @@
 <?php
-// 1. INICIAR LA SESIÓN
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
+/**
+ * Procesar Login - Usando Backend con MySQL
+ */
 
-// 2. Verificar que sea una petición POST
+require_once __DIR__ . '/config/config.php';
+require_once __DIR__ . '/models/User.php';
+require_once __DIR__ . '/includes/auth.php';
+require_once __DIR__ . '/includes/validators.php';
+
+// Verificar que sea una petición POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: login.php');
     exit();
 }
 
-// 3. Obtener datos del formulario de login.php
-$correo = isset($_POST['inputCorreo']) ? trim($_POST['inputCorreo']) : '';
+// Obtener datos del formulario
+$correo = isset($_POST['inputCorreo']) ? sanitizeInput($_POST['inputCorreo']) : '';
 $contrasena = isset($_POST['inputContraseña']) ? $_POST['inputContraseña'] : '';
 
 // Validaciones básicas
-if ($correo === '' || $contrasena === '') {
+if (empty($correo) || empty($contrasena)) {
     $params = http_build_query([
         'error' => 'datos_incompletos',
         'correo' => $correo
@@ -24,7 +28,7 @@ if ($correo === '' || $contrasena === '') {
     exit();
 }
 
-if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+if (!validateEmail($correo)) {
     $params = http_build_query([
         'error' => 'email_invalido',
         'correo' => $correo
@@ -33,61 +37,38 @@ if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
     exit();
 }
 
-// 4. SIMULACIÓN DE AUTENTICACIÓN
-// En producción: consultar base de datos con password_verify()
-$usuarios_demo = [
-    [
-        'id' => 1,
-        'nombre' => 'Administrador del Sistema',
-        'correo' => 'admin@example.com',
-        'role' => 'admin',
-        'password' => 'Admin123!' // Cumple criterios: 8+ chars, mayús/minús, número y símbolo
-    ],
-    [
-        'id' => 2, 
-        'nombre' => 'Cliente Demo',
-        'correo' => 'cliente@example.com',
-        'role' => 'client',
-        'password' => 'Cliente123!' // Cumple criterios: 8+ chars, mayús/minús, número y símbolo
-    ]
-];
-
-// Cargar usuarios registrados desde archivo persistente
-$usuarios_file = __DIR__ . '/temp_users.json';
-if (file_exists($usuarios_file)) {
-    $usuarios_guardados = json_decode(file_get_contents($usuarios_file), true);
-    if ($usuarios_guardados) {
-        $usuarios_demo = array_merge($usuarios_demo, $usuarios_guardados);
+try {
+    // Autenticar usuario con la base de datos
+    $userModel = new User();
+    $user = $userModel->verifyCredentials($correo, $contrasena);
+    
+    if ($user) {
+        // Autenticación exitosa
+        loginUser($user);
+        $userModel->updateLastLogin($user['id']);
+        
+        // Redirigir al dashboard
+        header('Location: agenda.php');
+        exit();
+    } else {
+        // Credenciales incorrectas
+        $params = http_build_query([
+            'error' => 'credenciales_incorrectas',
+            'correo' => $correo
+        ]);
+        header("Location: login.php?$params");
+        exit();
     }
-}
-
-// Buscar usuario por correo
-$usuario_encontrado = null;
-foreach ($usuarios_demo as $usuario) {
-    if ($usuario['correo'] === $correo) {
-        $usuario_encontrado = $usuario;
-        break;
-    }
-}
-
-// Verificar credenciales
-if (!$usuario_encontrado || $usuario_encontrado['password'] !== $contrasena) {
-    // Credenciales incorrectas
+    
+} catch (Exception $e) {
+    // Error del servidor
+    error_log("Error en login: " . $e->getMessage());
     $params = http_build_query([
-        'error' => 'credenciales_incorrectas',
+        'error' => 'error_servidor',
         'correo' => $correo
     ]);
     header("Location: login.php?$params");
     exit();
 }
-
-// 5. AUTENTICACIÓN EXITOSA - Crear sesión
-$_SESSION['user_id'] = $usuario_encontrado['id'];
-$_SESSION['user_name'] = $usuario_encontrado['nombre'];
-$_SESSION['user_role'] = $usuario_encontrado['role'];
-
-// 6. Redirigir al dashboard principal
-header('Location: agenda.php');
-exit();
 
 ?>

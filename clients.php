@@ -14,15 +14,51 @@ if ($is_admin_check) {
     $page_title = "Mis Mascotas";
 }
 
+// Load models for database operations
+require_once __DIR__ . '/models/Pet.php';
+require_once __DIR__ . '/models/User.php';
+require_once __DIR__ . '/models/Appointment.php';
+
+$petModel = new Pet();
+
+// Load clients with appointments if admin
+$clientsWithAppointments = [];
+if ($is_admin_check) {
+    try {
+        $appointmentModel = new Appointment();
+        $userModel = new User();
+        
+        // Get all appointments with user info
+        $appointments = $appointmentModel->getAllAppointmentsHistory();
+        
+        // Extract unique users
+        $userIds = [];
+        foreach ($appointments as $apt) {
+            if (!in_array($apt['user_id'], $userIds)) {
+                $userIds[] = $apt['user_id'];
+                $clientsWithAppointments[] = [
+                    'id' => $apt['user_id'],
+                    'name' => $apt['owner_name'],
+                    'rut' => $apt['owner_rut'],
+                    'phone' => $apt['owner_phone'],
+                    'email' => $apt['owner_email']
+                ];
+            }
+        }
+    } catch (Exception $e) {
+        error_log('Error loading clients: ' . $e->getMessage());
+    }
+}
+
 // -----------------------
-// Initialize demo storage in session
+// Initialize demo storage in session (for backwards compatibility)
 // -----------------------
 if (!isset($_SESSION['clients'])) {
-    $_SESSION['clients'] = [];        // id => ['id'=>int,'name'=>str,'rut'=>str,'phone'=>str,'email'=>str]
+    $_SESSION['clients'] = [];
     $_SESSION['next_client_id'] = 1;
 }
 if (!isset($_SESSION['pets'])) {
-    $_SESSION['pets'] = [];           // id => ['id'=>int,'owner_id'=>int,'name'=>str,'breed'=>str,'weight'=>float,'birth'=>YYYY-MM-DD,'notes'=>str]
+    $_SESSION['pets'] = [];
     $_SESSION['next_pet_id'] = 1;
 }
 
@@ -46,59 +82,125 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax_action'])) {
         $weight = isset($_POST['petWeight']) ? floatval($_POST['petWeight']) : null;
         $birth = isset($_POST['petBirthdate']) ? trim($_POST['petBirthdate']) : '';
         $notes = isset($_POST['petNotes']) ? trim($_POST['petNotes']) : '';
+        $species = isset($_POST['petSpecies']) ? trim($_POST['petSpecies']) : 'Perro';
         
-        // Get current user id (assumes $_SESSION['user_id'] exists for authenticated client)
-        $ownerId = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 1; // fallback to 1 for demo
+        // Get current user id
+        $ownerId = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : null;
+        
+        if (!$ownerId) {
+            $respond(false, ['error' => 'Usuario no identificado']);
+        }
 
         // Basic validation
-        if ($weight !== null && $weight > 12) {
-            $respond(false, ['error' => 'El peso no puede superar 12 kg.']);
+        if (empty($name)) {
+            $respond(false, ['error' => 'El nombre es requerido']);
         }
         
-        // create or update
-        if ($id === null) {
-            $id = $_SESSION['next_pet_id']++;
+        // Calculate age from birthdate
+        $age = null;
+        if (!empty($birth)) {
+            $birthDate = new DateTime($birth);
+            $today = new DateTime();
+            $age = $today->diff($birthDate)->y;
         }
-        $pet = [
-            'id' => $id,
-            'owner_id' => $ownerId,
+        
+        // Prepare data for database
+        $petData = [
+            'user_id' => $ownerId,
             'name' => $name,
+            'species' => $species,
             'breed' => $breed,
+            'age' => $age,
             'weight' => $weight,
-            'birth' => $birth,
             'notes' => $notes
         ];
-        $_SESSION['pets'][$id] = $pet;
-        $respond(true, ['pet' => $pet]);
+        
+        try {
+            if ($id === null) {
+                // Create new pet
+                $newId = $petModel->create($petData);
+                if ($newId) {
+                    $petData['id'] = $newId;
+                    $respond(true, ['pet' => $petData, 'message' => 'Mascota registrada exitosamente']);
+                } else {
+                    $respond(false, ['error' => 'Error al registrar la mascota']);
+                }
+            } else {
+                // Update existing pet
+                $success = $petModel->update($id, $petData);
+                if ($success) {
+                    $petData['id'] = $id;
+                    $respond(true, ['pet' => $petData, 'message' => 'Mascota actualizada exitosamente']);
+                } else {
+                    $respond(false, ['error' => 'Error al actualizar la mascota']);
+                }
+            }
+        } catch (Exception $e) {
+            $respond(false, ['error' => 'Error en la base de datos: ' . $e->getMessage()]);
+        }
     }
 
     // Delete pet (for clients)
     if ($action === 'delete_pet') {
         $id = isset($_POST['petId']) ? intval($_POST['petId']) : 0;
-        $ownerId = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 1; // fallback to 1 for demo
+        $ownerId = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : null;
         
-        if ($id && isset($_SESSION['pets'][$id])) {
-            $pet = $_SESSION['pets'][$id];
-            // Verify ownership
-            if ($pet['owner_id'] === $ownerId) {
-                unset($_SESSION['pets'][$id]);
-                $respond(true);
-            } else {
-                $respond(false, ['error' => 'No tienes permisos para eliminar esta mascota']);
+        if (!$ownerId) {
+            $respond(false, ['error' => 'Usuario no identificado']);
+        }
+        
+        if ($id) {
+            try {
+                // Verify ownership
+                $pet = $petModel->findById($id);
+                if ($pet && $pet['user_id'] == $ownerId) {
+                    $success = $petModel->delete($id);
+                    if ($success) {
+                        $respond(true, ['message' => 'Mascota eliminada exitosamente']);
+                    } else {
+                        $respond(false, ['error' => 'Error al eliminar la mascota']);
+                    }
+                } else {
+                    $respond(false, ['error' => 'No tienes permisos para eliminar esta mascota']);
+                }
+            } catch (Exception $e) {
+                $respond(false, ['error' => 'Error en la base de datos: ' . $e->getMessage()]);
             }
         } else {
-            $respond(false, ['error' => 'Mascota no encontrada']);
+            $respond(false, ['error' => 'ID de mascota inválido']);
         }
     }
 
     // Return pets for a given client (admin function)
     if ($action === 'get_client_pets') {
         $clientId = isset($_POST['clientId']) ? intval($_POST['clientId']) : 0;
-        $pets = [];
-        foreach ($_SESSION['pets'] as $p) {
-            if ($p['owner_id'] === $clientId) $pets[] = $p;
+        
+        if (!$clientId) {
+            $respond(false, ['error' => 'ID de cliente inválido']);
         }
-        $respond(true, ['pets' => array_values($pets)]);
+        
+        try {
+            // Get pets from database
+            $pets = $petModel->getPetsByUserId($clientId);
+            
+            // Format pets data
+            $formattedPets = [];
+            foreach ($pets as $pet) {
+                $formattedPets[] = [
+                    'id' => $pet['id'],
+                    'name' => $pet['name'],
+                    'species' => $pet['species'],
+                    'breed' => $pet['breed'],
+                    'age' => $pet['age'],
+                    'weight' => $pet['weight'],
+                    'notes' => $pet['notes']
+                ];
+            }
+            
+            $respond(true, ['pets' => $formattedPets]);
+        } catch (Exception $e) {
+            $respond(false, ['error' => 'Error al cargar mascotas: ' . $e->getMessage()]);
+        }
     }
 
     // Delete client (and associated pets) - admin function
@@ -173,14 +275,13 @@ include 'layout/header.php';
         <div class="card-header bg-white py-3 d-flex align-items-center justify-content-between">
             <h5 class="mb-0 fw-bold">Clientes registrados</h5>
             <div>
-                <button id="adminPopulateBtn" class="btn btn-outline-secondary btn-sm me-2">Poblar ejemplo</button>
                 <a href="clients.php" class="btn btn-secondary btn-sm">Refrescar</a>
             </div>
         </div>
         <div class="card-body p-0">
-            <?php if (empty($_SESSION['clients'])): ?>
+            <?php if (empty($clientsWithAppointments)): ?>
                 <div class="p-4 text-center text-muted">
-                    No hay clientes registrados. Usa "Poblar ejemplo" para añadir datos de prueba.
+                    No hay clientes registrados. Los clientes aparecerán aquí cuando tengan al menos una cita agendada.
                 </div>
             <?php else: ?>
                 <div class="table-responsive">
@@ -196,7 +297,7 @@ include 'layout/header.php';
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($_SESSION['clients'] as $client): ?>
+                            <?php foreach ($clientsWithAppointments as $client): ?>
                                 <tr data-client-id="<?php echo htmlspecialchars($client['id']); ?>">
                                     <td><?php echo htmlspecialchars($client['id']); ?></td>
                                     <td><?php echo htmlspecialchars($client['name']); ?></td>
@@ -205,11 +306,8 @@ include 'layout/header.php';
                                     <td><?php echo htmlspecialchars($client['email']); ?></td>
                                     <td>
                                         <div class="d-flex gap-2 justify-content-end">
-                                            <button class="btn btn-sm btn-outline-primary view-pets-btn" data-client-id="<?php echo htmlspecialchars($client['id']); ?>">
+                                            <button class="btn btn-sm btn-outline-primary view-pets-btn" data-client-id="<?php echo htmlspecialchars($client['id']); ?>" data-client-name="<?php echo htmlspecialchars($client['name']); ?>">
                                                 <i class="bi bi-card-list"></i> Ver mascotas
-                                            </button>
-                                            <button class="btn btn-sm btn-outline-danger delete-client-btn" data-client-id="<?php echo htmlspecialchars($client['id']); ?>">
-                                                <i class="bi bi-person-x"></i> Eliminar cliente
                                             </button>
                                         </div>
                                     </td>
@@ -251,24 +349,29 @@ include 'layout/header.php';
 
     <div class="row g-3" id="petsRow">
         <?php
-        // For clients, show their own pets (assume $_SESSION['user_id'] maps to client id)
+        // For clients, load their pets from database
         $uid = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
-        $found = false;
-        foreach ($_SESSION['pets'] as $pet) {
-            if ($pet['owner_id'] === $uid) {
-                $found = true;
-                $birthDisplay = '';
-                if (!empty($pet['birth'])) {
-                    $parts = explode('-', $pet['birth']);
-                    if (count($parts) === 3) $birthDisplay = $parts[2].'/'.$parts[1].'/'.$parts[0];
-                }
+        $myPets = [];
+        if ($uid > 0) {
+            $myPets = $petModel->getPetsByUserId($uid);
+        }
+        
+        if (empty($myPets)) {
+            echo '<div class="col-12"><div class="alert alert-info">No tienes mascotas registradas. Haz clic en "Agregar Mascota" para registrar una.</div></div>';
+        } else {
+            foreach ($myPets as $pet) {
+                $birthDisplay = $pet['age'] ? $pet['age'] . ' año' . ($pet['age'] != 1 ? 's' : '') : '—';
+                $weightDisplay = $pet['weight'] ? number_format($pet['weight'], 1) . ' kg' : '—';
+                $speciesDisplay = $pet['species'] ?? 'Perro';
+                
                 echo '<div class="col-md-6 col-lg-4" data-pet-id="'.htmlspecialchars($pet['id']).'">';
                 echo '  <div class="card shadow-sm h-100">';
                 echo '    <div class="card-body d-flex flex-column">';
                 echo '      <h5 class="card-title h4 fw-bold">'.htmlspecialchars($pet['name'] ?: 'Sin nombre').'</h5>';
-                echo '      <h6 class="card-subtitle mb-2 text-muted">'.htmlspecialchars($pet['breed'] ?: 'Raza no especificada').' - '.(is_numeric($pet['weight']) ? htmlspecialchars($pet['weight']).'kg' : '-').'</h6>';
+                echo '      <h6 class="card-subtitle mb-2 text-muted">'.htmlspecialchars($pet['breed'] ?: 'Raza no especificada').' - '.$weightDisplay.'</h6>';
                 echo '      <p class="card-text"><ul class="list-unstyled mb-0">';
-                echo '        <li><strong>Nacimiento:</strong> '.htmlspecialchars($birthDisplay).'</li>';
+                echo '        <li><strong>Especie:</strong> '.htmlspecialchars($speciesDisplay).'</li>';
+                echo '        <li><strong>Edad:</strong> '.htmlspecialchars($birthDisplay).'</li>';
                 echo '        <li><strong>Notas:</strong> '.htmlspecialchars($pet['notes'] ?: '—').'</li>';
                 echo '      </ul></p>';
                 echo '      <div class="mt-auto pt-3">';
@@ -279,9 +382,6 @@ include 'layout/header.php';
                 echo '  </div>';
                 echo '</div>';
             }
-        }
-        if (!$found) {
-            echo '<div class="col-12 text-muted">No tienes mascotas registradas.</div>';
         }
         ?>
     </div>
@@ -305,8 +405,17 @@ include 'layout/header.php';
                     <input type="hidden" id="petId" name="petId" value="">
 
                     <div class="mb-3">
-                        <label for="petName" class="form-label">Nombre</label>
+                        <label for="petName" class="form-label">Nombre <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="petName" name="petName" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="petSpecies" class="form-label">Especie <span class="text-danger">*</span></label>
+                        <select class="form-select" id="petSpecies" name="petSpecies" required>
+                            <option value="Perro">Perro</option>
+                            <option value="Gato">Gato</option>
+                            <option value="Otro">Otro</option>
+                        </select>
                     </div>
 
                     <div class="mb-3">
@@ -316,8 +425,7 @@ include 'layout/header.php';
 
                     <div class="mb-3">
                         <label for="petWeight" class="form-label">Peso (kg) <span class="text-danger">*</span></label>
-                        <input type="number" step="0.01" min="0" max="12" class="form-control" id="petWeight" name="petWeight" required>
-                        <div class="form-text">Máx. 12 kg.</div>
+                        <input type="number" step="0.01" min="0" class="form-control" id="petWeight" name="petWeight" required>
                     </div>
 
                     <div class="mb-3">
@@ -537,7 +645,15 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.view-pets-btn').forEach(btn => {
         btn.addEventListener('click', async (e) => {
             const clientId = btn.getAttribute('data-client-id');
+            const clientName = btn.getAttribute('data-client-name');
             if (!clientId) return;
+            
+            // Update modal title
+            const modalTitle = document.getElementById('clientPetsModalLabel');
+            if (modalTitle) {
+                modalTitle.textContent = `Mascotas de ${clientName}`;
+            }
+            
             if (clientPetsContainer) clientPetsContainer.innerHTML = 'Cargando...';
             const form = new URLSearchParams();
             form.append('ajax_action','get_client_pets');
@@ -558,9 +674,11 @@ document.addEventListener('DOMContentLoaded', () => {
                             col.innerHTML = `
                                 <div class="card">
                                     <div class="card-body">
-                                        <h5 class="card-title mb-1">${p.name || 'Sin nombre'}</h5>
-                                        <h6 class="card-subtitle mb-2 text-muted">${p.breed || '—'} - ${isNaN(p.weight) ? '-' : p.weight + 'kg'}</h6>
-                                        <p class="mb-1"><strong>Nacimiento:</strong> ${formatDateDMY(p.birth)}</p>
+                                        <h5 class="card-title mb-1"><i class="bi bi-heart-fill me-2" style="color: var(--active-link-color);"></i>${p.name || 'Sin nombre'}</h5>
+                                        <h6 class="card-subtitle mb-2 text-muted">${p.species || '—'}</h6>
+                                        <p class="mb-1"><strong>Raza:</strong> ${p.breed || '—'}</p>
+                                        <p class="mb-1"><strong>Edad:</strong> ${p.age ? p.age + ' años' : '—'}</p>
+                                        <p class="mb-1"><strong>Peso:</strong> ${p.weight ? p.weight + ' kg' : '—'}</p>
                                         <p class="mb-0"><strong>Notas:</strong> ${p.notes || '—'}</p>
                                     </div>
                                 </div>
@@ -572,10 +690,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     if (clientPetsModal) clientPetsModal.show();
                 } else {
-                    if (clientPetsContainer) clientPetsContainer.innerHTML = '<div class="text-danger">Error al obtener mascotas</div>';
+                    if (clientPetsContainer) clientPetsContainer.innerHTML = '<div class="text-danger">Error al obtener mascotas: ' + (json.error || 'Desconocido') + '</div>';
                 }
             } catch (err) {
-                if (clientPetsContainer) clientPetsContainer.innerHTML = '<div class="text-danger">Error de red</div>';
+                if (clientPetsContainer) clientPetsContainer.innerHTML = '<div class="text-danger">Error de red: ' + err.message + '</div>';
             }
         });
     });
