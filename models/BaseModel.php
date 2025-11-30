@@ -56,6 +56,10 @@ abstract class BaseModel {
         $stmt = $this->db->prepare($query);
         
         foreach ($data as $key => $value) {
+            // Convertir booleanos a enteros para MySQL
+            if (is_bool($value)) {
+                $value = $value ? 1 : 0;
+            }
             $stmt->bindValue(':' . $key, $value);
         }
         

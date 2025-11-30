@@ -98,11 +98,16 @@ $userPetsJson = json_encode($userPets);
     
     <?php if ($is_admin): ?>
     <!-- ADMINISTRATOR VIEW -->
-    <div class="d-flex justify-content-center justify-content-md-start align-items-center mb-3 admin-nav-control">
-        <button class="btn btn-outline-secondary me-3" id="prevMonthYearBtn"><i class="bi bi-chevron-left"></i></button>
-        <select class="form-select me-2" id="adminYearSelect"></select>
-        <select class="form-select me-3" id="adminMonthSelect"></select>
-        <button class="btn btn-outline-secondary" id="nextMonthYearBtn"><i class="bi bi-chevron-right"></i></button>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex align-items-center admin-nav-control">
+            <button class="btn btn-outline-secondary me-3" id="prevMonthYearBtn"><i class="bi bi-chevron-left"></i></button>
+            <select class="form-select me-2" id="adminYearSelect"></select>
+            <select class="form-select me-3" id="adminMonthSelect"></select>
+            <button class="btn btn-outline-secondary" id="nextMonthYearBtn"><i class="bi bi-chevron-right"></i></button>
+        </div>
+        <div>
+            <img src="images/imagen-b.png" alt="Dog Cute Spa" style="max-height: 80px; width: auto;">
+        </div>
     </div>
 
     <?php else: ?>

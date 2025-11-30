@@ -21,7 +21,11 @@ class Appointment extends BaseModel {
             $reminderDate = clone $appointmentDate;
             $reminderDate->modify('-2 months');
             $data['reminder_date'] = $reminderDate->format('Y-m-d');
-            $data['reminder_sent'] = false;
+            
+            // Solo establecer reminder_sent si no viene definido
+            if (!isset($data['reminder_sent'])) {
+                $data['reminder_sent'] = false;
+            }
         }
         
         return parent::create($data);

@@ -152,10 +152,11 @@ try {
                     'end_time' => $data['end_time'],
                     'service' => 'Bloqueo administrativo',
                     'status' => 'Bloqueado', // Estado específico para bloqueos
-                    'admin_notes' => isset($data['reason']) ? $data['reason'] : 'Bloqueado por administrador'
+                    'admin_notes' => isset($data['reason']) ? $data['reason'] : 'Bloqueado por administrador',
+                    'reminder_sent' => true // No enviar recordatorios para bloqueos
                 ];
                 
-                $appointmentId = $appointmentModel->createAppointment($appointmentData);
+                $appointmentId = $appointmentModel->create($appointmentData);
                 
                 if ($appointmentId) {
                     echo json_encode(['success' => true, 'appointment_id' => $appointmentId]);

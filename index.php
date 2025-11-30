@@ -47,7 +47,7 @@
 
     // Servicio principal de peluquería canina
     $servicio_principal = [
-        'titulo' => 'Baño y Corte Profesional',
+        'titulo' => 'Corte Profesional',
         'descripcion' => 'Servicio completo de peluquería canina que incluye baño con productos especializados, secado, corte de pelo según la raza y preferencias, corte de uñas y limpieza de oídos.',
         'caracteristicas' => [
             'Baño con shampoo especializado según tipo de pelo',
@@ -63,21 +63,9 @@
     $servicios_extras = [
         [
             'icono' => 'bi-droplet-fill',
-            'titulo' => 'Baño Medicinal',
-            'descripcion' => 'Baño especializado con productos dermatológicos para pieles sensibles.',
+            'titulo' => 'Solo Baño',
+            'descripcion' => 'Servicio de baño completo con shampoo especializado, secado profesional, corte de uñas y limpieza de oídos.',
             'precio' => 'Consultar precio'
-        ],
-        [
-            'icono' => 'bi-star-fill', 
-            'titulo' => 'Paquete Premium',
-            'descripcion' => 'Servicio completo + perfume canino + lazo decorativo.',
-            'precio' => 'Precio especial'
-        ],
-        [
-            'icono' => 'bi-scissors',
-            'titulo' => 'Solo Corte',
-            'descripcion' => 'Corte de pelo profesional sin baño (solo para mascotas limpias).',
-            'precio' => 'Precio reducido'
         ]
     ];
 
@@ -90,24 +78,8 @@
         ]
     ];
 
-    // Testimonios de clientes
-    $testimonios = [
-        [
-            'cliente' => 'Patricia Silva',
-            'mascota' => 'Luna (Golden Retriever)',
-            'testimonio' => 'Luna siempre sale hermosa y relajada. El trato es excelente y muy profesional, se nota el amor por las mascotas.'
-        ],
-        [
-            'cliente' => 'Roberto Chen',
-            'mascota' => 'Max (Poodle)',
-            'testimonio' => 'El mejor lugar para el corte de Max. Siempre queda perfecto y el precio es muy justo. Lo recomiendo 100%.'
-        ],
-        [
-            'cliente' => 'Carmen López',
-            'mascota' => 'Rocco (Pastor Alemán)',
-            'testimonio' => 'Rocco es muy nervioso, pero aquí lo tratan con mucha paciencia. El lugar es muy limpio y cómodo.'
-        ]
-    ];
+    // Testimonios de clientes - Comentado para futuras reseñas reales
+    $testimonios = [];
     ?>
 
     <!-- Hero Section -->
@@ -288,31 +260,6 @@
                         </a>
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Testimonios Section -->
-    <section class="py-5 bg-light">
-        <div class="container">
-            <h2 class="text-center mb-5">Lo que Dicen Nuestros Clientes</h2>
-            <div class="row">
-                <?php foreach ($testimonios as $testimonio): ?>
-                <div class="col-lg-4 mb-4">
-                    <div class="card shadow-sm h-100">
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <i class="bi bi-quote text-primary" style="font-size: 2rem;"></i>
-                            </div>
-                            <p class="card-text">"<?php echo $testimonio['testimonio']; ?>"</p>
-                            <footer class="blockquote-footer mt-3">
-                                <strong><?php echo $testimonio['cliente']; ?></strong>
-                                <small class="text-muted d-block">Dueño de <?php echo $testimonio['mascota']; ?></small>
-                            </footer>
-                        </div>
-                    </div>
-                </div>
-                <?php endforeach; ?>
             </div>
         </div>
     </section>
