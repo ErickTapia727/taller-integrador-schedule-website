@@ -40,9 +40,10 @@
 
     // Información de contacto
     $telefono = "+56 9 5397 9347";
+    $telefono_link = "56953979347";
     //TODO: preguntar correo de contacto a clienta
     $email = "contacto@dogcutespa.cl";
-    $direccion = "Av. Apóstol Santiago 1437, Renca, Región Metropolitana";
+    $direccion = "Av. Apóstol Santiago 1437";
 
     // Servicio principal de peluquería canina
     $servicio_principal = [
@@ -83,14 +84,9 @@
     // Equipo de peluquería canina
     $equipo = [
         [
-            'nombre' => 'María González',
-            'especialidad' => 'Peluquera Canina Certificada',
-            'experiencia' => '8 años especializándose en estética canina'
-        ],
-        [
-            'nombre' => 'Ana Martínez', 
-            'especialidad' => 'Especialista en Razas de Pelo Largo',
-            'experiencia' => '5 años trabajando con todas las razas'
+            'nombre' => 'Nycole Inostroza',
+            'especialidad' => 'Propietaria y Peluquera Canina',
+            'experiencia' => 'Especialista en cuidado y estética canina'
         ]
     ];
 
@@ -120,9 +116,10 @@
             <div class="container">
                 <div class="row align-items-center">
                     <div class="col-lg-6">
-                        <h1 class="display-4 fw-bold text-dark mb-4 "><?php echo $negocio_nombre; ?></h1>
-                        <p class="lead text-secondary mb-4"><?php echo $negocio_slogan; ?></p>
-                        <p class="mb-4"><?php echo $negocio_descripcion; ?></p>
+                        <h1 class="display-4 fw-bold text-dark mb-3"><?php echo $negocio_nombre; ?></h1>
+                        <p class="lead text-primary fw-semibold mb-2" style="font-size: 1.5rem;">✨ Atención personalizada y libre de estrés</p>
+                        <p class="text-muted mb-4"><?php echo $negocio_slogan; ?></p>
+                        <p class="mb-4 fs-5 lh-base">En Dog Cute Spa cuidamos a cada perrito con amor, paciencia y un trato suave. Usamos productos seguros y un manejo respetuoso para que disfruten su experiencia. Ofrecemos baños, cortes y limpieza con dedicación, para que tu peludo salga feliz, cómodo y oliendo delicioso. 🐶💕</p>
                         
                         <div class="d-flex gap-3 mb-4">
                             <a href="signin.php" class="btn btn-primary btn-lg custom-button">
@@ -136,17 +133,19 @@
                         <!-- Información de contacto rápido -->
                         <div class="contact-quick bg-light p-3 rounded">
                             <div class="row text-center">
-                                <div class="col-md-4 mb-2">
-                                    <i class="bi bi-telephone text-primary"></i>
-                                    <small class="d-block"><?php echo $telefono; ?></small>
+                                <div class="col-md-6 mb-2">
+                                    <i class="bi bi-whatsapp text-success fs-4"></i>
+                                    <small class="d-block mt-1"><strong><?php echo $telefono; ?></strong></small>
+                                    <a href="https://wa.me/<?php echo $telefono_link; ?>" target="_blank" class="btn btn-sm btn-outline-success mt-1">
+                                        <i class="bi bi-whatsapp me-1"></i>Contactar
+                                    </a>
                                 </div>
-                                <div class="col-md-4 mb-2">
-                                    <i class="bi bi-clock text-primary"></i>
-                                    <small class="d-block"><?php echo $horario_horas; ?></small>
-                                </div>
-                                <div class="col-md-4 mb-2">
-                                    <i class="bi bi-geo-alt text-primary"></i>
-                                    <small class="d-block">Santiago, Chile</small>
+                                <div class="col-md-6 mb-2">
+                                    <i class="bi bi-geo-alt-fill text-primary fs-4"></i>
+                                    <small class="d-block mt-1"><strong><?php echo $direccion; ?></strong></small>
+                                    <a href="https://maps.google.com/?q=<?php echo urlencode($direccion); ?>" target="_blank" class="btn btn-sm btn-outline-primary mt-1">
+                                        <i class="bi bi-map me-1"></i>Ver Mapa
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -267,14 +266,26 @@
                 
                 <div class="col-md-6">
                     <h3 class="mb-4"><i class="bi bi-envelope me-2"></i>Información de Contacto</h3>
-                    <div class="mb-2">
-                        <i class="bi bi-telephone me-2"></i><strong>Teléfono:</strong> <?php echo $telefono; ?>
+                    <div class="mb-3">
+                        <i class="bi bi-whatsapp me-2"></i>
+                        <strong>WhatsApp:</strong> 
+                        <a href="https://wa.me/<?php echo $telefono_link; ?>" target="_blank" class="text-white text-decoration-none">
+                            <?php echo $telefono; ?> <i class="bi bi-box-arrow-up-right ms-1"></i>
+                        </a>
                     </div>
-                    <div class="mb-2">
-                        <i class="bi bi-envelope me-2"></i><strong>Email:</strong> <?php echo $email; ?>
+                    <div class="mb-3">
+                        <i class="bi bi-geo-alt-fill me-2"></i>
+                        <strong>Dirección:</strong> 
+                        <a href="https://maps.google.com/?q=<?php echo urlencode($direccion); ?>" target="_blank" class="text-white text-decoration-none">
+                            <?php echo $direccion; ?>
+                        </a>
                     </div>
                     <div>
-                        <i class="bi bi-geo-alt me-2"></i><strong>Dirección:</strong> <?php echo $direccion; ?>
+                        <i class="bi bi-envelope-fill me-2"></i>
+                        <strong>Email:</strong> 
+                        <a href="mailto:<?php echo $email; ?>" class="text-white text-decoration-none">
+                            <?php echo $email; ?>
+                        </a>
                     </div>
                 </div>
             </div>

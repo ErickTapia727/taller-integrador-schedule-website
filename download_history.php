@@ -14,7 +14,7 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-require_once __DIR__ . '/config/config.php';
+//require_once __DIR__ . '/config/config.php';
 require_once __DIR__ . '/models/Appointment.php';
 
 $appointmentModel = new Appointment();
@@ -64,7 +64,6 @@ if ($isAdmin) {
         'Email Cliente',
         'Teléfono Cliente',
         'Mascota',
-        'Especie',
         'Raza',
         'Edad Mascota',
         'Peso Mascota (kg)',
@@ -81,7 +80,6 @@ if ($isAdmin) {
     fputcsv($output, [
         'ID Cita',
         'Mascota',
-        'Especie',
         'Raza',
         'Servicio',
         'Fecha Cita',
@@ -103,7 +101,6 @@ foreach ($appointments as $apt) {
             $apt['owner_email'] ?? 'N/A',
             $apt['owner_phone'] ?? 'N/A',
             $apt['pet_name'] ?? 'N/A',
-            $apt['pet_species'] ?? 'N/A',
             $apt['pet_breed'] ?? 'N/A',
             $apt['pet_age'] ? $apt['pet_age'] . ' años' : 'N/A',
             $apt['pet_weight'] ?? 'N/A',
@@ -121,7 +118,6 @@ foreach ($appointments as $apt) {
         fputcsv($output, [
             $apt['id'],
             $apt['pet_name'] ?? 'N/A',
-            $apt['pet_species'] ?? 'N/A',
             $apt['pet_breed'] ?? 'N/A',
             $apt['service'],
             date('d/m/Y', strtotime($apt['appointment_date'])),

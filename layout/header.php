@@ -169,8 +169,13 @@ if (!isset($active_link)) {
             </li>
             <li>
                 <a href="clients.php" class="nav-link text-dark <?php echo $active_link === 'clients' ? 'active-custom' : ''; ?>">
-                    <i class="bi bi-people me-2"></i>
-                    Clientes
+                    <?php if ($is_admin): ?>
+                        <i class="bi bi-people me-2"></i>
+                        Clientes
+                    <?php else: ?>
+                        <i class="bi bi-heart me-2"></i>
+                        Mis Mascotas
+                    <?php endif; ?>
                 </a>
             </li>
             <li>
@@ -202,7 +207,15 @@ if (!isset($active_link)) {
       <div class="offcanvas-body">
         <ul class="nav nav-pills flex-column mb-auto">
             <li class="nav-item"><a href="agenda.php" class="nav-link text-dark <?php echo $active_link === 'agenda' ? 'active-custom' : ''; ?>"><i class="bi bi-calendar-event me-2"></i>Agenda</a></li>
-            <li class="nav-item"><a href="clients.php" class="nav-link text-dark <?php echo $active_link === 'clients' ? 'active-custom' : ''; ?>"><i class="bi bi-people me-2"></i>Clientes</a></li>
+            <li class="nav-item">
+                <a href="clients.php" class="nav-link text-dark <?php echo $active_link === 'clients' ? 'active-custom' : ''; ?>">
+                    <?php if ($is_admin): ?>
+                        <i class="bi bi-people me-2"></i>Clientes
+                    <?php else: ?>
+                        <i class="bi bi-heart me-2"></i>Mis Mascotas
+                    <?php endif; ?>
+                </a>
+            </li>
             <li class="nav-item"><a href="history.php" class="nav-link text-dark <?php echo $active_link === 'history' ? 'active-custom' : ''; ?>"><i class="bi bi-clock-history me-2"></i>Historial</a></li>
             <li class="nav-item"><a href="settings.php" class="nav-link text-dark <?php echo $active_link === 'settings' ? 'active-custom' : ''; ?>"><i class="bi bi-gear me-2"></i>Ajustes</a></li>
         </ul>

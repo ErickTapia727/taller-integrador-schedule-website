@@ -9,6 +9,15 @@ class Pet extends BaseModel {
     protected $table = 'pets';
     
     /**
+     * Alias para getById (para compatibilidad)
+     * @param int $id
+     * @return array|false
+     */
+    public function findById($id) {
+        return $this->getById($id);
+    }
+    
+    /**
      * Obtener mascotas de un usuario específico
      * @param int $userId
      * @return array

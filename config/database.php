@@ -5,7 +5,7 @@
  */
 
 class Database {
-    // Configuración de la base de datos
+    // Configuración de la base de datos taller_user
     private $host = 'localhost';
     private $db_name = 'taller_integrador_db';
     private $username = 'taller_user';

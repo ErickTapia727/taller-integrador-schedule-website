@@ -82,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax_action'])) {
         $weight = isset($_POST['petWeight']) ? floatval($_POST['petWeight']) : null;
         $birth = isset($_POST['petBirthdate']) ? trim($_POST['petBirthdate']) : '';
         $notes = isset($_POST['petNotes']) ? trim($_POST['petNotes']) : '';
-        $species = isset($_POST['petSpecies']) ? trim($_POST['petSpecies']) : 'Perro';
+        $species = 'Perro';
         
         // Get current user id
         $ownerId = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : null;
@@ -121,7 +121,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax_action'])) {
                 $newId = $petModel->create($petData);
                 if ($newId) {
                     $petData['id'] = $newId;
-                    $respond(true, ['pet' => $petData, 'message' => 'Mascota registrada exitosamente']);
+                    // Formatear respuesta para el cliente
+                    $response = [
+                        'id' => $newId,
+                        'name' => $name,
+                        'breed' => $breed,
+                        'weight' => $weight,
+                        'age' => $age,
+                        'birth' => $birth,
+                        'notes' => $notes
+                    ];
+                    $respond(true, ['pet' => $response, 'message' => 'Mascota registrada exitosamente']);
                 } else {
                     $respond(false, ['error' => 'Error al registrar la mascota']);
                 }
@@ -340,8 +350,7 @@ include 'layout/header.php';
 
     <?php else: ?>
     <!-- CLIENT VIEW: show only the logged-in client's pets -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="h4 mb-0 fw-bold">Mis Mascotas</h2>
+    <div class="d-flex justify-content-end align-items-center mb-4">
         <button class="btn" id="openRegisterBtn" style="background-color: var(--active-link-color); color: white;" data-bs-toggle="modal" data-bs-target="#registerPetModal">
             <i class="bi bi-plus-circle-fill me-2"></i> Agregar Mascota
         </button>
@@ -362,15 +371,14 @@ include 'layout/header.php';
             foreach ($myPets as $pet) {
                 $birthDisplay = $pet['age'] ? $pet['age'] . ' año' . ($pet['age'] != 1 ? 's' : '') : '—';
                 $weightDisplay = $pet['weight'] ? number_format($pet['weight'], 1) . ' kg' : '—';
-                $speciesDisplay = $pet['species'] ?? 'Perro';
+                $birthDate = $pet['birth'] ?? '';
                 
-                echo '<div class="col-md-6 col-lg-4" data-pet-id="'.htmlspecialchars($pet['id']).'">';
+                echo '<div class="col-md-6 col-lg-4" data-pet-id="'.htmlspecialchars($pet['id']).'" data-pet-birth="'.htmlspecialchars($birthDate).'">';
                 echo '  <div class="card shadow-sm h-100">';
                 echo '    <div class="card-body d-flex flex-column">';
                 echo '      <h5 class="card-title h4 fw-bold">'.htmlspecialchars($pet['name'] ?: 'Sin nombre').'</h5>';
                 echo '      <h6 class="card-subtitle mb-2 text-muted">'.htmlspecialchars($pet['breed'] ?: 'Raza no especificada').' - '.$weightDisplay.'</h6>';
                 echo '      <p class="card-text"><ul class="list-unstyled mb-0">';
-                echo '        <li><strong>Especie:</strong> '.htmlspecialchars($speciesDisplay).'</li>';
                 echo '        <li><strong>Edad:</strong> '.htmlspecialchars($birthDisplay).'</li>';
                 echo '        <li><strong>Notas:</strong> '.htmlspecialchars($pet['notes'] ?: '—').'</li>';
                 echo '      </ul></p>';
@@ -409,15 +417,6 @@ include 'layout/header.php';
                         <input type="text" class="form-control" id="petName" name="petName" required>
                     </div>
                     
-                    <div class="mb-3">
-                        <label for="petSpecies" class="form-label">Especie <span class="text-danger">*</span></label>
-                        <select class="form-select" id="petSpecies" name="petSpecies" required>
-                            <option value="Perro">Perro</option>
-                            <option value="Gato">Gato</option>
-                            <option value="Otro">Otro</option>
-                        </select>
-                    </div>
-
                     <div class="mb-3">
                         <label for="petBreed" class="form-label">Raza <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="petBreed" name="petBreed" required>
@@ -473,13 +472,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const col = document.createElement('div');
         col.className = 'col-md-6 col-lg-4';
         col.setAttribute('data-pet-id', pet.id);
+        col.setAttribute('data-pet-birth', pet.birth || ''); // Guardar fecha de nacimiento
+        
+        // Calcular edad si hay fecha de nacimiento
+        let ageDisplay = '—';
+        if (pet.birth) {
+            const birthDate = new Date(pet.birth);
+            const today = new Date();
+            const years = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            const dayDiff = today.getDate() - birthDate.getDate();
+            
+            // Ajustar si no ha cumplido años este año
+            const age = (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) ? years - 1 : years;
+            ageDisplay = age > 0 ? `${age} año${age !== 1 ? 's' : ''}` : 'Menos de 1 año';
+        }
+        
         col.innerHTML = `
             <div class="card shadow-sm h-100">
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title h4 fw-bold">${pet.name || 'Sin nombre'}</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">${pet.breed || 'Raza no especificada'} - ${isNaN(pet.weight) ? '-' : (pet.weight + 'kg')}</h6>
+                    <h6 class="card-subtitle mb-2 text-muted">${pet.breed || 'Raza no especificada'} - ${isNaN(pet.weight) ? '—' : (pet.weight + ' kg')}</h6>
                     <p class="card-text"><ul class="list-unstyled mb-0">
-                        <li><strong>Nacimiento:</strong> ${formatDateDMY(pet.birth)}</li>
+                        <li><strong>Edad:</strong> ${ageDisplay}</li>
                         <li><strong>Notas:</strong> ${pet.notes || '—'}</li>
                     </ul></p>
                     <div class="mt-auto pt-3">
@@ -511,17 +526,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const breed = breedWeight[0] ? breedWeight[0].trim() : '';
                 const weight = breedWeight[1] ? breedWeight[1].replace('kg','').trim() : '';
                 
-                // Parse birth date from card
-                const birthLi = cardCol.querySelector('.card-text li');
-                let birth = '';
-                if (birthLi) {
-                    const txt = birthLi.textContent || '';
-                    const m = txt.match(/Nacimiento:\s*([\d\/]+)/);
-                    if (m && m[1]) {
-                        const parts = m[1].split('/');
-                        if (parts.length === 3) birth = `${parts[2]}-${parts[1]}-${parts[0]}`; // back to YYYY-MM-DD
-                    }
-                }
+                // Get birth date from data attribute
+                const birth = cardCol.getAttribute('data-pet-birth') || '';
                 
                 // Parse notes
                 const notesLi = cardCol.querySelectorAll('.card-text li')[1];
@@ -624,9 +630,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (existing) {
                         existing.replaceWith(newCard);
                     } else {
-                        // Remove empty message if exists
-                        const emptyMsg = petsRow.querySelector('.col-12.text-muted');
-                        if (emptyMsg) emptyMsg.remove();
+                        // Remove empty message if exists (buscar por la clase .alert-info)
+                        const emptyMsg = petsRow.querySelector('.col-12 .alert-info');
+                        if (emptyMsg) emptyMsg.parentElement.remove();
                         petsRow.prepend(newCard);
                     }
                     if (registerModal) registerModal.hide();
@@ -675,7 +681,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <div class="card">
                                     <div class="card-body">
                                         <h5 class="card-title mb-1"><i class="bi bi-heart-fill me-2" style="color: var(--active-link-color);"></i>${p.name || 'Sin nombre'}</h5>
-                                        <h6 class="card-subtitle mb-2 text-muted">${p.species || '—'}</h6>
                                         <p class="mb-1"><strong>Raza:</strong> ${p.breed || '—'}</p>
                                         <p class="mb-1"><strong>Edad:</strong> ${p.age ? p.age + ' años' : '—'}</p>
                                         <p class="mb-1"><strong>Peso:</strong> ${p.weight ? p.weight + ' kg' : '—'}</p>

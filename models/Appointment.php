@@ -9,12 +9,54 @@ class Appointment extends BaseModel {
     protected $table = 'appointments';
     
     /**
+     * Crear una nueva cita
+     * Sobrescribe el método padre para calcular automáticamente reminder_date
+     * @param array $data
+     * @return int|false
+     */
+    public function create(array $data) {
+        // Calcular la fecha del recordatorio (2 meses antes)
+        if (isset($data['appointment_date'])) {
+            $appointmentDate = new DateTime($data['appointment_date']);
+            $reminderDate = clone $appointmentDate;
+            $reminderDate->modify('-2 months');
+            $data['reminder_date'] = $reminderDate->format('Y-m-d');
+            $data['reminder_sent'] = false;
+        }
+        
+        return parent::create($data);
+    }
+    
+    /**
+     * Actualizar una cita
+     * Sobrescribe el método padre para recalcular reminder_date si cambia la fecha
+     * @param int $id
+     * @param array $data
+     * @return bool
+     */
+    public function update($id, array $data) {
+        // Si se actualiza la fecha de la cita, recalcular reminder_date
+        if (isset($data['appointment_date'])) {
+            $appointmentDate = new DateTime($data['appointment_date']);
+            $reminderDate = clone $appointmentDate;
+            $reminderDate->modify('-2 months');
+            $data['reminder_date'] = $reminderDate->format('Y-m-d');
+            $data['reminder_sent'] = false;
+        }
+        
+        return parent::update($id, $data);
+    }
+    
+    /**
      * Obtener citas de un usuario específico
      * @param int $userId
      * @return array
      */
     public function getAppointmentsByUserId($userId) {
-        $query = "SELECT a.*, p.name as pet_name, p.breed, u.name as owner_name 
+        $query = "SELECT a.*, 
+                  p.name as pet_name, p.species as pet_species, p.breed as pet_breed, 
+                  p.age as pet_age, p.weight as pet_weight,
+                  u.name as owner_name, u.email as owner_email, u.phone as owner_phone, u.rut as owner_rut
                   FROM {$this->table} a 
                   INNER JOIN pets p ON a.pet_id = p.id 
                   INNER JOIN users u ON a.user_id = u.id 

@@ -68,8 +68,8 @@
                     <div class="alert alert-danger">Contraseña no cumple con los criterios.</div>
                 <?php elseif ($_GET['error'] === 'telefono_invalido'): ?>
                     <div class="alert alert-danger">Teléfono inválido.</div>
-                <?php else: ?>
-                    <div class="alert alert-danger">Por favor, revisa el campo resaltado e intenta nuevamente.</div>
+                <!-- <?php else: ?>
+                    <div class="alert alert-danger">Por favor, revisa el campo resaltado e intenta nuevamente.</div> -->
                 <?php endif; ?>
               <?php endif; ?>
 

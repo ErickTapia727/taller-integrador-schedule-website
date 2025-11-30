@@ -107,14 +107,15 @@ $userPetsJson = json_encode($userPets);
 
     <?php else: ?>
     <!-- CLIENT VIEW -->
-    <ul class="nav nav-tabs border-bottom-0 month-nav-tabs mb-3" id="monthTab" role="tablist">
-      <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="month1-tab" type="button">Current Month</button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link" id="month2-tab" type="button">Next Month</button>
-      </li>
-    </ul>
+    <div class="d-flex justify-content-center align-items-center mb-3">
+        <button class="btn btn-outline-secondary me-3" id="prevMonthClientBtn">
+            <i class="bi bi-chevron-left"></i>
+        </button>
+        <h5 class="mb-0 fw-bold mx-4" id="currentMonthDisplay" style="min-width: 200px; text-align: center;">Mes Actual</h5>
+        <button class="btn btn-outline-secondary ms-3" id="nextMonthClientBtn">
+            <i class="bi bi-chevron-right"></i>
+        </button>
+    </div>
     <?php endif; ?>
 
     <div class="btn-toolbar justify-content-center week-selector" role="toolbar" aria-label="Selector de semana" id="weekSelectionBar"></div>
@@ -290,9 +291,7 @@ $userPetsJson = json_encode($userPets);
         // --- CONFIGURATION ---
         const isAdmin = document.body.dataset.isAdmin === 'true'; 
         const today = new Date(); 
-        const month1 = new Date(today.getFullYear(), today.getMonth(), 1); 
-        const month2 = new Date(today.getFullYear(), today.getMonth() + 1, 1); 
-        let displayedMonth = new Date(month1); 
+        let displayedMonth = new Date(today.getFullYear(), today.getMonth(), 1); 
         let displayedWeekIndex = 0; 
 
         const timeSlots = ['08:00 - 10:00', '10:00 - 12:00', '12:00 - 14:00', '14:00 - 16:00', '16:00 - 17:00'];
@@ -444,12 +443,38 @@ $userPetsJson = json_encode($userPets);
             btnGroup.className = 'btn-group flex-wrap';
             btnGroup.setAttribute('role', 'group');
 
+            // Calcular el primer lunes del rango visible
+            const firstDayOfMonth = new Date(displayedMonth.getFullYear(), displayedMonth.getMonth(), 1);
+            let weekStartDate = new Date(firstDayOfMonth);
+            const firstDayOfWeek = firstDayOfMonth.getDay();
+            const daysToSubtract = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
+            weekStartDate.setDate(weekStartDate.getDate() - daysToSubtract);
+
             for (let i = 0; i < totalWeeks; i++) {
+                // Calcular fechas de inicio y fin de la semana
+                const weekStart = new Date(weekStartDate);
+                weekStart.setDate(weekStart.getDate() + (i * 7));
+                const weekEnd = new Date(weekStart);
+                weekEnd.setDate(weekEnd.getDate() + 6);
+                
+                // Formatear las fechas
+                const startDay = weekStart.getDate();
+                const endDay = weekEnd.getDate();
+                const startMonth = weekStart.toLocaleDateString('es-ES', { month: 'short' }).replace('.', '');
+                const endMonth = weekEnd.toLocaleDateString('es-ES', { month: 'short' }).replace('.', '');
+                
+                let dateRange;
+                if (startMonth === endMonth) {
+                    dateRange = `${startDay}-${endDay} ${startMonth}`;
+                } else {
+                    dateRange = `${startDay} ${startMonth} - ${endDay} ${endMonth}`;
+                }
+                
                 const button = document.createElement('button');
                 button.type = 'button';
                 const btnColor = i === displayedWeekIndex ? 'btn-danger active' : 'btn-outline-danger';
                 button.className = `btn m-1 ${btnColor}`;
-                button.textContent = `Semana ${i + 1}`;
+                button.innerHTML = `<strong>Semana ${i + 1}</strong><br><small>${dateRange}</small>`;
                 button.addEventListener('click', () => { displayedWeekIndex = i; renderAll(); });
                 btnGroup.appendChild(button);
             }
@@ -991,28 +1016,41 @@ $userPetsJson = json_encode($userPets);
             document.getElementById('nextMonthYearBtn').addEventListener('click', () => { displayedMonth.setMonth(displayedMonth.getMonth() + 1); adminYearSelect.value = displayedMonth.getFullYear(); adminMonthSelect.value = displayedMonth.getMonth(); displayedWeekIndex = 0; renderAll(); });
             initAdminSelectors();
         } else {
-             const m1Btn = document.getElementById('month1-tab');
-             const m2Btn = document.getElementById('month2-tab');
-             const m1 = new Date(today.getFullYear(), today.getMonth(), 1);
-             const m2 = new Date(today.getFullYear(), today.getMonth() + 1, 1);
-             m1Btn.textContent = getMonthYearString(m1);
-             m2Btn.textContent = getMonthYearString(m2);
-             m1Btn.addEventListener('click', () => { 
-                 displayedMonth = m1; 
-                 displayedWeekIndex = 0; 
-                 loadAppointments(); 
+             // Cliente: Navegación con flechas (sin límite de meses)
+             const currentMonthDisplay = document.getElementById('currentMonthDisplay');
+             const prevBtn = document.getElementById('prevMonthClientBtn');
+             const nextBtn = document.getElementById('nextMonthClientBtn');
+             
+             let currentMonthOffset = 0;
+             
+             const updateMonthDisplay = () => {
+                 displayedMonth = new Date(today.getFullYear(), today.getMonth() + currentMonthOffset, 1);
+                 currentMonthDisplay.textContent = getMonthYearString(displayedMonth);
+                 
+                 // Deshabilitar botón anterior solo si estamos en el mes actual
+                 prevBtn.disabled = currentMonthOffset === 0;
+                 // Botón siguiente siempre habilitado (sin límite)
+                 nextBtn.disabled = false;
+                 
+                 displayedWeekIndex = 0;
+                 loadAppointments();
                  renderAll();
-                 m1Btn.classList.add('active'); 
-                 m2Btn.classList.remove('active');
+             };
+             
+             prevBtn.addEventListener('click', () => {
+                 if (currentMonthOffset > 0) {
+                     currentMonthOffset--;
+                     updateMonthDisplay();
+                 }
              });
-             m2Btn.addEventListener('click', () => { 
-                 displayedMonth = m2; 
-                 displayedWeekIndex = 0; 
-                 loadAppointments(); 
-                 renderAll();
-                 m2Btn.classList.add('active'); 
-                 m1Btn.classList.remove('active');
+             
+             nextBtn.addEventListener('click', () => {
+                 currentMonthOffset++;
+                 updateMonthDisplay();
              });
+             
+             // Inicializar display
+             updateMonthDisplay();
         }
 
         // Load appointments from database and render

@@ -12,11 +12,11 @@ $is_admin_check = (isset($_SESSION['user_role']) && $_SESSION['user_role'] === '
 if ($is_admin_check) {
     $page_title = "Historial de Citas";
 } else {
-    $page_title = "Mi Historial";
+    $page_title = "Mi Historial de Citas";
 }
 
 // 3. Include required models
-require_once __DIR__ . '/config/config.php';
+// require_once __DIR__ . '/config/config.php';
 require_once __DIR__ . '/models/Appointment.php';
 
 // 4. Get appointments from database
@@ -173,9 +173,7 @@ include 'layout/header.php';
     <!-- =================================================================== -->
     
     <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="h4 mb-0 fw-bold">Mi Historial de Citas</h2>
-        <!-- Optional: A download button -->
+    <div class="d-flex justify-content-end align-items-center mb-4">
         <?php
         // Build download URL with current filters
         $downloadParams = [];
